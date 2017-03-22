@@ -1,8 +1,12 @@
-<?php 
+<?php
+
+/*
+ *  @author Igor Klimets <igor35hh@gmail.com>
+ */
 
 	require_once(dirname(__FILE__).'/config/config.inc.php');
 	
-	$the_report = '';
+	$the_report = "";
 	
 	$ftp_server    = 'ftp.mlife.dp.ua';
 	$ftp_user_name = 'healthshop';
@@ -17,6 +21,8 @@
 		$fname = 'order.csv';
 	
 		if (!file_exists($fname)) {
+			
+			$wasrecord = 0;
 				
 			$fileCsv = fopen($fname,"a+");
 				
@@ -51,6 +57,8 @@
 					);
 						
 					fputcsv($fileCsv, $headOfRow, ';');
+					
+					$wasrecord = 1;
 						
 					$id_order = $row['id_order'];
 						
@@ -66,6 +74,10 @@
 						}
 					}
 						
+				}
+				
+				if($wasrecord = 1) {
+					$the_report = "Orders have unloaded \n" . $the_report;
 				}
 			}
 				
@@ -90,6 +102,11 @@
 		ftp_get($conn_id, 'product_rest.csv', 'product_rest.csv', FTP_ASCII);
 		ftp_get($conn_id, 'combination_rest.csv', 'combination_rest.csv', FTP_ASCII);
 		ftp_get($conn_id, 'order_answer.csv', 'order_answer.csv', FTP_ASCII);
+		//
+		ftp_delete($conn_id, 'product_price.csv');
+		ftp_delete($conn_id, 'product_rest.csv');
+		ftp_delete($conn_id, 'combination_rest.csv');
+		ftp_delete($conn_id, 'order_answer.csv');
 	}
 	
 	ftp_close($conn_id);
@@ -101,6 +118,8 @@
 		if (file_exists($fname)) {
 			
 			$lines = file($fname);
+			
+			$wasrecord = 0;
 			
 			foreach($lines as $line) {
 			
@@ -125,10 +144,14 @@
 			
 					Db::getInstance() -> update('product_shop', $update, $where);
 					Db::getInstance() -> update('product', $update, $where);
+					
+					$wasrecord = 1;
 				}
-				
-				$the_report = '';
 			
+			}
+			
+			if($wasrecord = 1) {
+				$the_report = "Prices have loaded \n" . $the_report;
 			}
 			
 			try { unlink($fname); } catch (Exception $e) {}
@@ -146,6 +169,8 @@
 		if (file_exists($fname)) {
 		
 			$lines = file($fname);
+			
+			$wasrecord = 0;
 			
 			foreach($lines as $line) {
 			
@@ -169,8 +194,14 @@
 					
 					$where = "id_product=$id_product and id_product_attribute=0";
 					Db::getInstance() -> update('stock_available', $update, $where);
+					
+					$wasrecord = 1;
 				}
 					
+			}
+			
+			if($wasrecord = 1) {
+				$the_report = "Rests of products have loaded \n" . $the_report;
 			}
 			
 			try { unlink($fname); } catch (Exception $e) {}
@@ -191,6 +222,8 @@
 			$lines = file($fname);
 			
 			$totalcount = array ();
+			
+			$wasrecord = 0;
 		
 			foreach($lines as $line) {
 		
@@ -220,6 +253,8 @@
 					
 					$totalcount[$id_product] = $id_product;
 					
+					$wasrecord = 1;
+					
 					//if (isset($totalcount[$id_product])) {
 						//$totalcount[$id_product] += $rest;
 					//} else {
@@ -239,7 +274,13 @@
 					);
 					$where = "id_product=$key and id_product_attribute=0";
 					Db::getInstance() -> update('stock_available', $update, $where);
+					
+					$wasrecord = 1;
 				}
+			}
+			
+			if($wasrecord = 1) {
+				$the_report = "Rests of combinations have loaded \n" . $the_report;
 			}
 			
 			try { unlink($fname); } catch (Exception $e) {}
@@ -258,6 +299,8 @@
 		if (file_exists($fname)) {
 				
 			$lines = file($fname);
+			
+			$wasrecord = 0;
 				
 			foreach($lines as $line) {
 					
@@ -289,10 +332,14 @@
 					);
 		
 					Db::getInstance() -> insert('order_history', $update, $where);
-				}
-	
-				$the_report = '';
 					
+					$wasrecord = 1;
+				}
+					
+			}
+			
+			if($wasrecord = 1) {
+				$the_report = "Statuses of orders have loaded \n" . $the_report;
 			}
 				
 			try { unlink($fname); } catch (Exception $e) {}
@@ -305,14 +352,18 @@
 	
 	try {
 		
-		$to      = 'igor35hh@gmail.com';
-		$subject = 'the subject';
-		$message = 'hello';
-		$headers = 'From: info@healthshop.com.ua' . "\r\n" .
-				'Reply-To: info@healthshop.com.ua' . "\r\n" .
-				'X-Mailer: PHP/' . phpversion();
+		if($the_report != "") {
 		
-		//mail($to, $subject, $message, $headers);
+			$to      = 'kelembet@svcorp.com.ua'; //kelembet@svcorp.com.ua
+			$subject = "Health Shop's report";
+			$message = $the_report;
+			$headers = 'From: info@healthshop.com.ua' . "\r\n" .
+					'Reply-To: info@healthshop.com.ua' . "\r\n" .
+					'X-Mailer: PHP/' . phpversion();
+			
+			mail($to, $subject, $message, $headers);
+		
+		}
 	
 	} catch (Exception $e) {
 		//echo 'Exeption of sendding mail: ',  $e->getMessage(), "\n";
