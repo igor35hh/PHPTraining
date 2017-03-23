@@ -125,6 +125,53 @@
 	$content = file_get_contents("data/$fname");
 	echo n12br($content);
 
+	$name = trim($_POST['name']);
+	$phone = trim($_POST['phone']);
+
+	$name_correct = strlen($name) > 1;
+	$phone_correct = is_numeric($phone);
+
+	$db = new PDO('mysql:host=localhost;dbname=site', 'root', '');
+	$db->exec("SET NAMES UTF8");
+	$query = $db->prepare("Insert Into apps (name, phone) Values(:name, :phone)");
+	$values = ['name' => $name, 'phone' => $phone];
+	$query->execute($values);
+	//
+	$query = $db->prepare("Select * from apps");
+	$query->execute();
+	$apps = $query->fetchAll(PDO::FETCH_ASSOC);
+
+	//session
+
+	session_start();
+	if(!isiset($_SESSION['counter']) $_SESSION['counter']=0;
+	echo "you have update this page ".$_SESSION['counter']++." times";
+	echo "<br><a href=".$_SERVER['PHP_SELF']."> update";
+
+	session_start();
+	if($_SESSION['authorized']<>1) {
+		header("Location: /auth.php");
+		header("Location: /script.php?".session_name().'='.session_id());
+		exit;
+	}
+
+	//if you have register_globals=off
+	unset($_SESSION['var']);
+	//if no
+	session_unregister('var');
+
+	if(isset($_REQUEST[session_name()])) session_start();
+
+	//session.save_patch = c:\windows\temp
+
+	ini_set('display_errors', 1);
+	error_reporting(E_ALL);
+
+	session_write_close();
+
+	session_cache_limiter("private");
+
+	
 
 	/*
 	phpinfo();
