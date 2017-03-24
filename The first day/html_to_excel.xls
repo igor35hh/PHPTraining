@@ -1,0 +1,23 @@
+<html>
+<head>
+ <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<table>
+ <tr>
+  <th>Заголовок 1</th>
+  <th>Заголовок 2</th>
+  <th>Заголовок 3</th>
+ </tr>
+ <tr>
+  <td>Данные 11</td>
+  <td>Данные 12</td>
+  <td>Данные 13</td>
+ </tr>
+ <tr>
+  <td>Данные 21</td>
+  <td>Данные 22</td>
+  <td>Данные 23</td>
+ </tr>
+</table>
+</html>
