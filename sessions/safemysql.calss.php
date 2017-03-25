@@ -74,6 +74,109 @@
 			return mysqli_free_result($result);
 		}
 
+		public function getOne() {
+			$query = $this->prepareQuery(func_get_args());
+			if($res = $this->rawQuery($query)) {
+				$row = $this->fetch($res);
+				if(is_array($row)) {
+					return reset($row);
+				}
+				$this->free($res);
+			}
+			return FALSE;
+		}
+
+		public function getRow() {
+			$query = $this->prepareQuery(func_get_args());
+			if($res = $this->rawQuery($query)) {
+				$ret = $this->fetch($res);
+				if(is_array($row)) {
+					return reset($ret);
+				}
+			}
+			return FALSE;
+		}
+
+		public function getCol() {
+			$ret = array();
+			$query = $this->prepareQuery(func_get_args());
+			if($res = $this->rawQuery($query)) {
+				while($row = $this->fetch($res)) {
+					$ret[] = reset($row);
+				}
+				$this->free($res);
+			}
+			return $ret;
+		}
+
+		public function getAll() {
+			$ret = array();
+			$query = $this->prepareQuery(func_get_args());
+			if($res = $this->rawQuery($query)) {
+				while($row = $this->fetch($res)) {
+					$ret[] = $row;
+				}
+				$this->free($res);
+			}
+			return $ret;
+		}
+
+		public function getInd() {
+			$ret = array();
+			$args = func_get_args();
+			$index = array_shift($args);
+			$query = $this->prepareQuery($args);
+			if($res = $this->rawQuery($query)) {
+				while($row = $this->fetch($res)) {
+					$ret[$row[$index]] = $row;
+				}
+				$this->free($res);
+			}
+			return $ret;
+		}
+
+		public function getIndCol() {
+			$ret = array();
+			$args = func_get_args();
+			$index = array_shift($args);
+			$query = $this->prepareQuery($args);
+			if($res = $this->rawQuery($query)) {
+				while($row = $this->fetch($res)) {
+					$key = $row[$index];
+					unset($row[$index]);
+					$ret[$key] = reset($row);
+				}
+				$this->free($res);
+			}
+			return $ret;
+		}
+
+		public function parce() {
+			return $this->prepareQuery(func_get_args());
+		}
+
+		public function whiteList($input, $allowed, $default=FALSE) {
+			$found = array_search($input, $allowed);
+			return ($found === FALSE) ? $default : $allowed[$found];
+		}
+
+		public function filterArray($input, $allowed) {
+			foreach (array_keys($input) as $key) {
+				if (!in_array($key, $allowed)) {
+					unset($input[$key]);
+				}
+			}
+			return $input;
+		}
+
+		public function lastQuery() {
+			$last = end($this->stats);
+			return $last['query'];
+		}
+
+		public function getStats() {
+			return $this->stats;
+		}
 
 	}
 
