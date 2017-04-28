@@ -1,11 +1,20 @@
-<h3 class="page-product-heading">Product comments</h3>
+<h3 class="page-product-heading" id="mymodcomments-content-tab" {if isset($new_comment_posted)} data-scroll="true"{/if}>
+{l s='Product comments' mod='mymodcomments'</h3>
 
 <div class="rte">
 	{foreach from=$comments item=comment}
-		<p>
-			<strong>Comment #{$comment.id_mymod_comment}:</strong> {$comment.comment}<br>
-			<strong>Grade:</strong> {$comment.grade}/5<br>
-		</p><br>
+		<div class="mymodcomments-comment">
+			<div class="star-rating">
+				<i class="glyphicon glyphicon-star"></i>
+				<strong>Grade:</strong> {$comment.grade}/5<br>	
+			</div>
+			<input type="number" value="{$comment.grade}" class="rating" max="5" step="1" data-size="xs">
+			<div>
+				<i class="glyphicon glyphicon-star"></i>
+				<strong>Comment #{$comment.id_mymod_comment}:</strong> {$comment.comment}
+			</div>
+		</div>
+		<hr/>
 	{/foreach}
 </div>
 

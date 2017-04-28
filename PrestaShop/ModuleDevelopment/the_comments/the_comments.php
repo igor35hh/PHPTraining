@@ -7,16 +7,41 @@
 			$this->tab = 'front_office_features';
 			$this->version = '0.1';
 			$this->author = 'Igor Klimets';
-			$this->displayName = 'The module of product comments';
-			$this->description = 'The customer will be able to grade and comments your products.';
+
 			$this->bootstrap = true;
 			parent::__construct();
+
+			$this->displayName = $this->l('My Module of product comments');
+			$this->description = $this->l(
+				'With this module your customer will be able to grade and comments your products');
+			
 		}
 
 		public function install() {
-			parent::install();
-			$this->registerHook('displayProductTabContent');
-			return true;
+
+			if (!parent::install() || !$this->registerHook('displayProductTabContent'))
+				return false;
+
+			//parent::install();
+			//$this->registerHook('displayProductTabContent');
+			//return true;
+
+			return Db::getInstance()->execute('
+				CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'mymod_comment` (
+					id_mymod_comment int(11) NOT NULL AUTO_INCREMENT,
+					id_product int(11) NOT NULL,
+					grade tinyint(1) NOT NULL,
+					comment text NOT NULL,date_add datetime NOT NULL,
+					PRIMARY KEY (id_mymod_comment)) ENGINE='._MYSQL_ENGINE_.'
+					DEFAULT CHARSET=utf8 AUTO_INCREMENT=1');
+
+		}
+
+		public function uninstall() {
+			if (!parent::uninstall())
+				return false;
+
+			return (Db::getInstance()->execute('DROP TABLE `'._DB_PREFIX_.'mymod_comment`'));
 		}
 
 		public function processProductTabContent() {
@@ -31,6 +56,7 @@
 			 		'date_add' => date('Y-m-d H:i:s'),
 			 	);
 			 	Db::getInstance()->insert('mymod_comment', $insert);
+			 	$this->context->smarty->assign('new_comment_posted', 'true');
 			}
 		}
 
@@ -41,6 +67,14 @@
 			$id_product = Tools::getValue('id_product');
 			$comments = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'mymod_comment` 
 				WHERE `id_product`='.(int)$id_product);
+
+			$this->context->controller->addCSS($this->_path.'views/css/star-rating.css', 'all');
+			$this->context->controller->addJS($this->_path.'views/js/star-rating.js');
+
+			$this->context->controller->addCSS($this->_path.'views/css/mymodcomments.css', 'all');
+			$this->context->controller->addJS($this->_path.'views/js/mymodcomments.js');
+
+			//die($this->_path.'views/js/mymodcomments.js');
 
 			$this->context->smarty->assign('enable_grades', $enable_grades);
 			$this->context->smarty->assign('enable_comments', $enable_comments);

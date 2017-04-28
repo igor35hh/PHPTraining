@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
 	<name>the_comments</name>
-	<displayName><![CDATA[The module of product comments]]></displayName>
+	<displayName><![CDATA[My Module of product comments]]></displayName>
 	<version><![CDATA[0.1]]></version>
-	<description><![CDATA[The customer will be able to grade and comments your products.]]></description>
+	<description><![CDATA[With this module your customer will be able to grade and comments your products]]></description>
 	<author><![CDATA[Igor Klimets]]></author>
 	<tab><![CDATA[front_office_features]]></tab>
 	<is_configurable>1</is_configurable>
