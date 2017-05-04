@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-	<name>the_comments</name>
+	<name>mymodcomments</name>
 	<displayName><![CDATA[My Module of product comments]]></displayName>
 	<version><![CDATA[0.2]]></version>
 	<description><![CDATA[With this module your customer will be able to grade and comments your products]]></description>

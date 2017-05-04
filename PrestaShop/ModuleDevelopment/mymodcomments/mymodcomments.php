@@ -1,9 +1,9 @@
 <?php
 	
-	class the_comments extends Module {
+	class mymodcomments extends Module {
 
 		public function __construct() {
-			$this->name = 'the_comments';
+			$this->name = 'mymodcomments';
 			$this->tab = 'front_office_features';
 			$this->version = '0.2';
 			$this->author = 'Igor Klimets';

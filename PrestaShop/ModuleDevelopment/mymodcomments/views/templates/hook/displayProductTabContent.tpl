@@ -20,36 +20,46 @@
 	{/foreach}
 </div>
 
+<div class="rte">
+	{assign var=params value[
+		'module_action' => 'list',
+		'product_rewrite' => $product->link_rewrite,
+		'id_product' => $smarty.get.id_product,
+		'page' => 1
+	]}
+	<a href="{$link->getModuleLink('mymodcomments', 'comments', $params)}">{l s='See all comments' mod='mymodcomments'}</a>
+</div>
+
 {if $enable_grades eq 1 OR $enable_comments eq 1}
 <div class="rte">
 	<form action="" method="POST" id="comment-form">
 
-			<div class="form-group">
-				<label for="firstname">{l s='Firstname:' mod='mymodcomments'}</label>
-				<div class="row">
-					<div class="col-xs-4">
-						<input type="text" name="firstname" id="firstname" class="form-control" />
-					</div>
+		<div class="form-group">
+			<label for="firstname">{l s='Firstname:' mod='mymodcomments'}</label>
+			<div class="row">
+				<div class="col-xs-4">
+					<input type="text" name="firstname" id="firstname" class="form-control" />
 				</div>
 			</div>
+		</div>
 
-			<div class="form-group">
-				<label for="lastname">{l s='Lastname:' mod='mymodcomments'}</label>
-				<div class="row">
-					<div class="col-xs-4">
-						<input type="text" name="lastname" id="lastname" class="form-control" />
-					</div>
+		<div class="form-group">
+			<label for="lastname">{l s='Lastname:' mod='mymodcomments'}</label>
+			<div class="row">
+				<div class="col-xs-4">
+					<input type="text" name="lastname" id="lastname" class="form-control" />
 				</div>
 			</div>
+		</div>
 
-			<div class="form-group">
-				<label for="email">{l s='Email:' mod='mymodcomments'}</label>
-				<div class="row">
-					<div class="col-xs-4">
-						<input type="email" name="email" id="email" class="form-control" />
-					</div>
+		<div class="form-group">
+			<label for="email">{l s='Email:' mod='mymodcomments'}</label>
+			<div class="row">
+				<div class="col-xs-4">
+					<input type="email" name="email" id="email" class="form-control" />
 				</div>
 			</div>
+		</div>
 
 		{if $enable_grades eq 1}
 			<div class="form-group">
@@ -74,7 +84,7 @@
 				<span>{l s='Send' mod='mymodcomments'}<i class="icon-chevron-right right"></i></span>	
 			</button>
 		</div>
-		</form>
+
 	</form>
 </div>
 {/if}

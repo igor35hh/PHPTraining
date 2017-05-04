@@ -2,7 +2,7 @@
 	<div class="alert alert-success">Setting updated</div>
 {/if}
 <fieldset>
-	<h2>Module cinfiguration</h2>
+	<h2>Module configuration</h2>
 	<div class="panel">
 		<div class="panel-heading">
 			<legend><img src="../img/admin/cog.gif" alt="" width="16"/>Configuration</legend>
