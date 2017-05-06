@@ -13,5 +13,17 @@
 </div>
 
 <ul class="pagination">
-	
+	{for $count=1 to $nb_pages}
+        {assign var=params value=[
+            'module_action' => 'list',
+            'product_rewrite' => $product->link_rewrite,
+            'id_product' => $smarty.get.id_product,
+            'page' => $count
+        ]}
+        {if $page ne $count}
+            <li><a href="{$link->getModuleLink('mymodcomments', 'comments', $params)}"><span>{$count}</span> </a></li>
+        {else}
+            <li class="active current"><span><span>{$count}</span></span> </li>
+        {/if}
+    {/for}
 </ul>

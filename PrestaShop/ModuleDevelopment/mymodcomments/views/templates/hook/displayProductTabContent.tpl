@@ -32,6 +32,13 @@
 
 {if $enable_grades eq 1 OR $enable_comments eq 1}
 <div class="rte">
+
+	{if isset($new_comment_posted) && $new_comment_posted eq 'error'}
+		<div class="alert alert-danger">
+			<p>{l s='Some fields of the form seems wrong, please check them before submitting your comment.' mod='mymodcomments'}</p>
+		</div>
+    {/if}
+	
 	<form action="" method="POST" id="comment-form">
 
 		<div class="form-group">

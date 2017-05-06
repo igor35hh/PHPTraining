@@ -1,4 +1,6 @@
 <?php
+
+	require_once(dirname(__FILE__). '/classes/MyModComment.php');
 	
 	class mymodcomments extends Module {
 
@@ -23,7 +25,10 @@
 			//$this->registerHook('displayProductTabContent');
 			//return true;
 
-			if (!parent::install() || !$this->registerHook('displayProductTabContent') || !$this->registerHook('displayBackOfficeHeader'))
+			if (!parent::install() || 
+				!$this->registerHook('displayProductTabContent') || 
+				!$this->registerHook('displayBackOfficeHeader') || 
+				!$this->registerHook('ModuleRoutes'))
 				return false;
 
 			$sql_file = dirname(__FILE__).'/install/install.sql';
@@ -88,84 +93,39 @@
 			return '';
 		}
 
+		public function getHookController($hook_name) {
+			require_once(dirname(__FILE__).'/controllers/hook/'. $hook_name.'.php');
+			$controller_name = $this->name.$hook_name.'Controller';
+			$controller = new $controller_name($this, __FILE__, $this->_path);
+			return $controller;
+		}
+
 		public function hookDisplayBackOfficeHeader($params) {
-			if(Tools::getValue('controller') != 'AdminModules') {
-				return '';
-			}
-			$this->context->smarty->assign('pc_base_dir', __PS_BASE_URI__.'modules/'.$this->name.'/');
-			return $this->display(__FILE__,'displayBackOfficeHeader.tpl');
+			$controller = $this->getHookController('displayBackOfficeHeader');
+			return $controller->run($params);
+			// if(Tools::getValue('controller') != 'AdminModules') {
+			// 	return '';
+			// }
+			// $this->context->smarty->assign('pc_base_dir', __PS_BASE_URI__.'modules/'.$this->name.'/');
+			// return $this->display(__FILE__,'displayBackOfficeHeader.tpl');
 		}
 
-		public function processProductTabContent() {
-			if(Tools::isSubmit('mymod_pc_submit_comment')) {
-				$id_product = Tools::getValue('id_product');
-				$firstname = Tools::getValue('firstname');
-				$lastname = Tools::getValue('lasttname');
-				$email = Tools::getValue('email');
-			 	$grade = Tools::getValue('grade');
-			 	$comment = Tools::getValue('comment');
-			 	$insert = array (
-			 		'id_product' => (int)$id_product,
-			 		'firstname' => pSQL($firstname),
-			 		'lastname' => pSQL($lastname),
-			 		'email' => pSQL($email),
-			 		'grade' => (int)$grade,
-			 		'comment' => pSQL($comment),
-			 		'date_add' => date('Y-m-d H:i:s'),
-			 	);
-			 	Db::getInstance()->insert('mymod_comment', $insert);
-			 	$this->context->smarty->assign('new_comment_posted', 'true');
-			}
-		}
-
-		public function assignProductTabContent() {
-			$enable_grades = Configuration::get('MYMOD_GRADES');
-			$enable_comments = Configuration::get('MYMOD_COMMENTS');
-
-			$id_product = Tools::getValue('id_product');
-			$comments = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'mymod_comment` 
-				WHERE `id_product`='.(int)$id_product);
-
-			$this->context->controller->addCSS($this->_path.'views/css/star-rating.css', 'all');
-			$this->context->controller->addJS($this->_path.'views/js/star-rating.js');
-
-			$this->context->controller->addCSS($this->_path.'views/css/mymodcomments.css', 'all');
-			$this->context->controller->addJS($this->_path.'views/js/mymodcomments.js');
-
-			//die($this->_path.'views/js/mymodcomments.js');
-
-			$this->context->smarty->assign('enable_grades', $enable_grades);
-			$this->context->smarty->assign('enable_comments', $enable_comments);
-			$this->context->smarty->assign('comments', $comments);
+		public function hookModuleRoutes() {
+			$controller = $this->getHookController('modulesRoutes');
+			return $controller->run();
 		}
 
 		public function hookDisplayProductTabContent($params) {
-			$this->processProductTabContent();
-			$this->assignProductTabContent();
-			return $this->display(__FILE__, 'displayProductTabContent.tpl');
-		}
-
-		public function processConfiguration() {
-			if(Tools::isSubmit('mymod_pc_form')) {
-				$enable_grades = Tools::getValue('enable_grades');
-				$enable_comments = Tools::getValue('enable_comments');
-				Configuration::updateValue('MYMOD_GRADES', $enable_grades);
-				Configuration::updateValue('MYMOD_COMMENTS', $enable_comments);
-				$this->context->smarty->assign('confirmation', 'ok');
-			}
-		}
-
-		public function assignConfiguration() {
-			$enable_grades = Configuration::get('MYMOD_GRADES');
-			$enable_comments = Configuration::get('MYMOD_COMMENTS');
-			$this->context->smarty->assign('enable_grades', $enable_grades);
-			$this->context->smarty->assign('enable_comments', $enable_comments);
+			$controller = $this->getHookController('displayProductTabContent');
+			return $controller->run($params);
+			// $this->processProductTabContent();
+			// $this->assignProductTabContent();
+			// return $this->display(__FILE__, 'displayProductTabContent.tpl');
 		}
 
 		public function getContent() {
-			$this->processConfiguration();
-			$this->assignConfiguration();
-			return $this->display(__FILE__,'getContent.tpl');
+			$controller = $this->getHookController('getContent');
+			return $controller->run();
 		}
 
 	}
