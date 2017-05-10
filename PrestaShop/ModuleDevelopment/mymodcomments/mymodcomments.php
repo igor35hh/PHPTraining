@@ -7,7 +7,7 @@
 		public function __construct() {
 			$this->name = 'mymodcomments';
 			$this->tab = 'front_office_features';
-			$this->version = '0.2';
+			$this->version = '0.3';
 			$this->author = 'Igor Klimets';
 
 			$this->bootstrap = true;
@@ -25,9 +25,15 @@
 			//$this->registerHook('displayProductTabContent');
 			//return true;
 
+			if(!$this->installTab('AdminCatalog', 'AdminMyModComments', 'MyMod Comments')) {
+				return false;
+			}
+
 			if (!parent::install() || 
 				!$this->registerHook('displayProductTabContent') || 
-				!$this->registerHook('displayBackOfficeHeader') || 
+				!$this->registerHook('displayBackOfficeHeader') ||
+				!$this->registerHook('displayAdminProductsExtra') ||
+				!$this->registerHook('displayAdminCustomers') || 
 				!$this->registerHook('ModuleRoutes'))
 				return false;
 
@@ -58,6 +64,9 @@
 			$sql_file = dirname(__FILE__).'/install/uninstall.sql';
 			if(!$this->loadSQLFile($sql_file))
 				return false;
+
+			if (!$this->uninstallTab('AdminMyModComments'))
+			return false;
 
 			Configuration::deleteByName('MYMOD_GRADES');
 			Configuration::deleteByName('MYMOD_COMMENTS');
@@ -124,7 +133,43 @@
 		}
 
 		public function getContent() {
+			$ajax_hook = Tools::getValue('ajax_hook');
+			if ($ajax_hook != '')
+			{
+				$ajax_method = 'hook'.ucfirst($ajax_hook);
+				if (method_exists($this, $ajax_method))
+					die($this->{$ajax_method}(array()));
+			}
+
 			$controller = $this->getHookController('getContent');
+			return $controller->run();
+		}
+
+		public function installTab($parent, $class_name, $name) {
+			$tab = new Tab();
+			$tab->id_parent = (int)Tab::getIdFromClassName($parent);
+			$tab->name = array();
+			foreach (Language::getLanguages(true) as $lang)
+				$tab->name[$lang['id_lang']] = $name;
+			$tab->class_name = $class_name;
+			$tab->module = $this->name;
+			$tab->active = 1;
+			return $tab->add();
+		}
+
+		public function uninstallTab($class_name) {
+			$id_tab = (int)Tab::getIdFromClassName($class_name);
+			$tab = new Tab((int)$id_tab);
+			return $tab->delete();
+		}
+
+		public function hookDisplayAdminProductsExtra($params) {
+			$controller = $this->getHookController('displayAdminProductsExtra');
+			return $controller->run();
+		}
+
+		public function hookDisplayAdminCustomers($params) {
+			$controller = $this->getHookController('displayAdminCustomers');
 			return $controller->run();
 		}
 
