@@ -19,6 +19,9 @@
 			if (!parent::install())
 				return false;
 
+			if (!$this->registerHook('actionCarrierUpdate'))
+				return false;
+
 			if (!$this->installCarriers())
 				return false;
 
@@ -86,11 +89,12 @@
 		}
 
 		public function getOrderShippingCost($params, $shipping_cost) {
-			return 23;
+			$controller = $this->getHookController('getOrderShippingCost');
+			return $controller->run($params, $shipping_cost);
 		}
 
 		public function getOrderShippingCostExternal($params) {
-			return false;
+			return $this->getOrderShippingCost($params, 0);
 		}
 
 		public function getHookController($hook_name) {
@@ -103,6 +107,26 @@
 		public function getContent() {
 			$controller = $this->getHookController('getContent');
 			return $controller->run();
+		}
+
+		public function hookActionCarrierUpdate($params) {
+			$controller = $this->getHookController('actionCarrierUpdate');
+			return $controller->run($params);
+		}
+
+		public function loadSQLFile($sql_file) {
+
+			$sql_content = file_get_contents($sql_file);
+			$sql_content = str_replace('PREFIX_', _DB_PREFIX_, $sql_content);
+			$sql_requests = preg_split("/;\s*[\r\n]+/", $sql_content);
+			$result = true;
+			foreach($sql_requests AS $request) {
+				if (!empty($request)) {
+					$result &= Db::getInstance()->execute(trim($request));
+				}
+			}
+
+			return $result;
 		}
 
 	}
