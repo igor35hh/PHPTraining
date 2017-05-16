@@ -8,9 +8,9 @@
 	
 	$the_report = "";
 	
-	$ftp_server    = 'ftp.mlife.dp.ua';
-	$ftp_user_name = 'healthshop';
-	$ftp_user_pass = 'J1m7gOKu6TFN0q8k';
+	$ftp_server    = '';
+	$ftp_user_name = '';
+	$ftp_user_pass = '';
 	
 	$conn_id = ftp_connect($ftp_server);
 	$login_result = ftp_login($conn_id, $ftp_user_name, $ftp_user_pass);
